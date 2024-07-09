@@ -1,8 +1,12 @@
 import { Schema, model } from "mongoose";
+import User from "./UserSchema";
 // import { type } from "os";
 
 const ProfileSchema = Schema({
-  name: { type: String },
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: User,
+  },
   gender: { type: Boolean },
   dob: { type: Date },
   religion: { type: String },
