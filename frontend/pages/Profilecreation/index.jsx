@@ -1,21 +1,73 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import "./profile.css";
-import { Link } from "react-router-dom";
 
 const Profile = () => {
-  const getSelectValues = (select) => {
-    const result = [];
-    const options = select && select.options;
-    for (let i = 0; i < options.length; i++) {
-      const opt = options[i];
-      if (opt.selected) {
-        result.push(opt.value || opt.text);
-      }
-    }
-    return result;
-  };
   //   const selectElement = document.getElementById("frame");
   //   const selectedValues = getSelectValues(selectElement);
   //   console.log(selectedValues); // Array of selected values
+  const { id } = useParams();
+  // const { id } = useParams();
+  const [use, setUser] = useState({});
+
+  const Getjobb = async () => {
+    const getresponseeee = await axios.get(
+      `http://localhost:1400/user/job/employee/${id}`
+    );
+    console.log(getresponseeee);
+    setUser(getresponseeee.data);
+  };
+
+  const navigate = useNavigate();
+  const [cred, setCred] = useState({
+    gender: "",
+    religion: "",
+    horriscope: "",
+    motherTongue: "",
+    about: "",
+    height: "",
+    weight: "",
+    bodytype: "",
+    marrital: "",
+    education: "",
+    occupation: "",
+    income: "",
+    passion: "",
+    futureplan: "",
+    fatherjob: "",
+    mothername: "",
+    motherjob: "",
+    siblngs: "",
+    contact: "",
+    email: "",
+    address: "",
+  });
+  const onPro = (e) => {
+    setCred({
+      ...cred,
+      [e.target.name]: e.target.value,
+      job: use._id,
+      reg: use.reg._id,
+      user: use.user._id,
+    });
+  };
+
+  const Next3 = async () => {
+    const response = await axios.post(
+      `http://localhost:1400/user/profile`,
+      cred
+    );
+    // console.log("hlooooo", response.data.pro._id);
+    if (response.data.pro) {
+      navigate(`/`);
+    }
+  };
+  useEffect(() => {
+    Getjobb();
+  }, []);
+
   return (
     <div className="profile">
       <h1 className="head">Matrimony</h1>
@@ -24,41 +76,40 @@ const Profile = () => {
         <div className="card1">
           <h1>personal details</h1>
           <div className="card1_1">
-            <label htmlFor="">Name</label>
-            <input type="text" name="name" />
-            <br />
             <label htmlFor="">Gender</label>
-            <select name="" id="frame">
+            {/* <select name="gender" id="frame" onSelect={onPro}>
               <option value="">Male</option>
               <option value="">Female</option>
               <option value="">Other</option>
-            </select>{" "}
+            </select>{" "} */}
+            <input type="text" name="gender" onChange={onPro} id="" />
             <br />
-            <label htmlFor="">DOB</label>
-            <input type="date" /> <br />
             <label htmlFor="">Religion</label>
-            <input type="text" name="religion" /> <br />
+            <input type="text" name="religion" onChange={onPro} /> <br />
+            <label htmlFor="">Horriscope</label>
+            <input type="text" name="horriscope" onChange={onPro} /> <br />
             <label htmlFor="">Mother Toungue</label>
-            <input type="text" name="Mother Toungue" />
+            <input type="text" name="motherTongue" onChange={onPro} />
+            <br />
+            <label htmlFor="">Marrital status</label>
+            <input type="text" name="marrital" onChange={onPro} />
           </div>
         </div>
         <div className="card2">
           <h1>Basic info</h1>
           <div className="card1_2">
             <label htmlFor="">About</label>
-            <textarea name="" id=""></textarea>
+            <textarea name="about" id="" onChange={onPro}></textarea>
             <br />
             <label htmlFor="">Height</label>
-            <input type="text" name="Height" />
+            <input type="number" name="height" onChange={onPro} />
             <br />
             <label htmlFor="">Weight</label>
-            <input label="" type="text" name="Weight" />
+            <input label="" type="number" name="weight" onChange={onPro} />
             <br />
             <label htmlFor="">Body type</label>
-            <input type="text" name="Body type" />
+            <input type="text" name="bodytype" onChange={onPro} />
             <br />
-            <label htmlFor="">Marrital status</label>
-            <input type="text" name="marital status" />
           </div>
         </div>
 
@@ -66,67 +117,59 @@ const Profile = () => {
           <h1>Career</h1>
           <div className="card1_3">
             <label htmlFor="">Education</label>
-            <input type="text" name="education" />
+            <input type="text" name="education" onChange={onPro} />
             <br />
             <label htmlFor="">Occupation</label>
-            <input type="text" name="occupation" />
+            <input type="text" name="occupation" onChange={onPro} />
             <br />
             <label htmlFor="">Annual income</label>
-            <input type="text" name="annual nc" />
+            <input type="number" name="income" onChange={onPro} />
             <br />
             <label htmlFor="">Passion</label>
-            <input type="text" name="passsion" />
+            <input type="text" name="passsion" onChange={onPro} />
             <br />
             <label htmlFor="">Future plans</label>
-            <input type="text" name="future" />
+            <input type="text" name="futureplan" onChange={onPro} />
           </div>
         </div>
         <div className="card4">
           <h1>family</h1>
           <div className="card1_4">
             <label htmlFor="">Father Name</label>
-            <input type="text" name="" />
+            <input type="text" name="fathername" onChange={onPro} />
             <br />
             <label htmlFor="">Father Occupation</label>
-            <input type="text" name="" />
+            <input type="text" name="fatherjob" onChange={onPro} />
             <br />
             <label htmlFor="">Mother Name</label>
-            <input type="text" name="" />
+            <input type="text" name="mothername" onChange={onPro} />
             <br />
             <label htmlFor="">Mother Occupation</label>
-            <input type="text" name="" />
+            <input type="text" name="motherjob" onChange={onPro} />
             <br />
             <label htmlFor="">Siblings</label>
-            <input type="text" name="" />
+            <input type="text" name="siblings" onChange={onPro} />
           </div>
         </div>
         <div className="card5">
           <h1>Address</h1>
           <div className="card1_5">
             <label htmlFor="">Contact</label>
-            <input type="number" /> <br />
+            <input type="number" name="contact" onChange={onPro} /> <br />
             <label htmlFor="">email</label>
-            <input type="number" /> <br />
+            <input type="text" name="email" onChange={onPro} /> <br />
             <label htmlFor="">Address</label>
-            <input type="" name="adres" /> <br />
-          </div>
-        </div>
-        <div className="card6">
-          <h1>Lifestyle</h1>
-          <div className="card1_6">
-            <label htmlFor="">Drinking</label>
-            <input type="number" /> <br />
-            <label htmlFor="">Smoking</label>
-            <input type="number" /> <br />
-            <label htmlFor="">Intrests</label>
-            <input type="" name="adres" /> <br />
+            <input type="text" name="address" onChange={onPro} /> <br />
           </div>
         </div>
       </div>
-
-      <Link to="/landing" className="sub">
+      <button className="sub" onClick={Next3}>
         Submit
-      </Link>
+      </button>
+
+      {/* <Link to="/landing" className="sub">
+        Submit
+      </Link> */}
 
       <footer></footer>
     </div>

@@ -13,6 +13,12 @@ const Home = () => {
       <br />
       <Link to="/profile">Profile</Link>
       <br />
+      <Link to="/landing">Landing</Link>
+      <br />
+      <Link to="/job">job</Link> <br />
+      <a href="">jjj</a>
+      <input type="text" />
+      <div id="hhai" className="hai"></div>
     </div>
   );
 };

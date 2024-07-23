@@ -1,9 +1,11 @@
 import "./login.css";
-import { Link } from "react-router-dom";
-// import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { useState } from "react";
+// import useNavigate from "react-router-dom";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [data, setData] = useState({ username: "", password: "" });
 
   const insert = (e) => {
@@ -11,11 +13,28 @@ const Login = () => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
 
-  // const Onlogin = async () => {
-  //   const response = await axios.post(`http://localhost:2300/user/login`, data);
-  //   console.log(response);
-  //   setData(response);
-  // };
+  const Onlogin = async () => {
+    const response = await axios.post(
+      `http://localhost:1400/user/login`,
+      // {
+      //   headers: {
+      //     Authorization: `Bearer ${localStorage.getItem("token")}`,
+      //   },
+      // },
+      data
+    );
+
+    localStorage.setItem("token", response.data.token);
+
+    console.log("hlooooooooooooooo", response);
+    if (response.data.token) {
+      navigate(`/choose/${response.data.prof._id}`);
+    }
+  };
+
+  const respos = async () => {
+    window.location.href = "http://localhost:1400/pass/login/federated/google";
+  };
 
   return (
     <div className="full">
@@ -28,10 +47,10 @@ const Login = () => {
           <br />
 
           <label htmlFor="">Password</label>
-          <input type="text" name="password" />
+          <input type="text" name="password" onChange={insert} />
         </div>
 
-        <button className="log" onClick="">
+        <button className="log1" onClick={Onlogin}>
           Login
         </button>
         <p className="account">
@@ -41,7 +60,9 @@ const Login = () => {
           </Link>
         </p>
         <p className="or">or</p>
-        <button className="google">Sign in with Google</button>
+        <button className="google" onClick={respos}>
+          Sign in with Google
+        </button>
       </div>
       {/* <img src="https://wallpaperaccess.com/full/1276498.jpg" alt="" /> */}
     </div>

@@ -1,21 +1,68 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./usersignup.css";
 
 const SignUp = () => {
+  const navigate = useNavigate();
+  // const [res, setRes] = useState();
+  const [cred, setCred] = useState({
+    name: "",
+    username: "",
+    password: "",
+    confirmpassword: "",
+  });
+
+  const onRegchange = (e) => {
+    const { name, value } = e.target;
+    setCred({ ...cred, [name]: value });
+  };
+  const OnReg = async () => {
+    const response = await axios.post(
+      `http://localhost:1400/user/signup`,
+      cred
+    );
+    console.log(response.data);
+    // if (response.data.detail) {
+    // const data = response.data.detail;
+    // const { id } = data._id;
+    console.log(response.data.detail._id);
+    navigate(`/registration/${response.data.detail._id}`);
+    // }
+  };
+  // useEffect(() => {
+  //   OnReg();
+  // }, []);
+
   return (
     <div className="usersign">
       <div className="data">
         <h1>SignUp</h1>
         <div className="insert">
           <label htmlFor="">Name</label>
-          <input type="text" />
+          <input type="text" name="name" onChange={onRegchange} />
+          <br />
           <label htmlFor="">Username</label>
-          <input type="text" />
+          <input type="text" name="username" onChange={onRegchange} />
+          <br />
           <label htmlFor="">Password</label>
-          <input type="text" />
+          <input type="password" name="password" onChange={onRegchange} />
+          <br />
           <label htmlFor="">ConfirmPassword</label>
-          <input type="text" />
+          <input
+            type="password"
+            name="confirmpassword"
+            onChange={onRegchange}
+          />
+          <br />
         </div>
-        <button className="up">SignUp</button>
+        <button className="up" onClick={OnReg}>
+          SignUp
+        </button>
+        {/* <Link to="/registration">signup</Link> */}
+
+        <p>or</p>
+        <button className="up2">SignUp with Google</button>
       </div>
     </div>
   );

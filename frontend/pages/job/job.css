@@ -1,0 +1,19 @@
+.job {
+  width: 300px;
+  margin: auto;
+  margin-top: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  align-items: center;
+  text-align: center;
+  border: 1px solid black;
+  padding: 60px;
+}
+
+.empbtn {
+  padding: 20px 30px 20px 30px;
+  font-size: large;
+  background-color: rgb(119, 188, 188);
+  border-radius: 10px;
+}
