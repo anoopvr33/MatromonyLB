@@ -1,310 +1,172 @@
-// var express = require('express');
+// var express = require("express");
+import express from "express";
 // var passport = require('passport');
-// var GoogleStrategy = require('passport-google-oauth20');
-// var db = require('../db');
+// var GoogleStrategy = require('passport-google-oidc');
+import passport from "passport";
+import GoogleStrategy from "passport-google-oidc";
+import dotenv from "dotenv";
+// import User from "../db/schema/User.js";
+import User from "../db/Schema/UserSchema.js";
+// import UserLog from "./UserLog/index.js";
+dotenv.config({ path: "./.env" });
 
-// // Configure the Facebook strategy for use by Passport.
-// //
-// // OAuth 2.0-based strategies require a `verify` function which receives the
-// // credential (`accessToken`) for accessing the Facebook API on the user's
-// // behalf, along with the user's profile.  The function must invoke `cb`
-// // with a user object, which will be set at `req.user` in route handlers after
-// // authentication.
-// passport.use(new GoogleStrategy({
-//   clientID: process.env['GOOGLE_CLIENT_ID'],
-//   clientSecret: process.env['GOOGLE_CLIENT_SECRET'],
-//   callbackURL: '/oauth2/redirect/google',
-//   scope: [ 'profile' ],
-//   state: true
-// },
-// function(accessToken, refreshToken, profile, cb) {
-//   db.get('SELECT * FROM federated_credentials WHERE provider = ? AND subject = ?', [
-//     'https://accounts.google.com',
-//     profile.id
-//   ], function(err, row) {
-//     if (err) { return cb(err); }
-//     if (!row) {
-//       db.run('INSERT INTO users (name) VALUES (?)', [
-//         profile.displayName
-//       ], function(err) {
-//         if (err) { return cb(err); }
-//         var id = this.lastID;
-//         db.run('INSERT INTO federated_credentials (user_id, provider, subject) VALUES (?, ?, ?)', [
-//           id,
-//           'https://accounts.google.com',
-//           profile.id
-//         ], function(err) {
-//           if (err) { return cb(err); }
-//           var user = {
-//             id: id,
-//             name: profile.displayName
-//           };
-//           return cb(null, user);
-//         });
-//       });
-//     } else {
-//       db.get('SELECT rowid AS id, * FROM users WHERE rowid = ?', [ row.user_id ], function(err, row) {
-//         if (err) { return cb(err); }
-//         if (!row) { return cb(null, false); }
-//         return cb(null, row);
-//       });
-//     }
-//   });
-// }));
-
-// // Configure Passport authenticated session persistence.
-// //
-// // In order to restore authentication state across HTTP requests, Passport needs
-// // to serialize users into and deserialize users out of the session.  In a
-// // production-quality application, this would typically be as simple as
-// // supplying the user ID when serializing, and querying the user record by ID
-// // from the database when deserializing.  However, due to the fact that this
-// // example does not have a database, the complete Facebook profile is serialized
-// // and deserialized.
-// passport.serializeUser(function(user, cb) {
-//   process.nextTick(function() {
-//     cb(null, { id: user.id, username: user.username, name: user.name });
-//   });
-// });
-
-// passport.deserializeUser(function(user, cb) {
-//   process.nextTick(function() {
-//     return cb(null, user);
-//   });
-// });
-
-// var router = express.Router();
-
-// /* GET /login
-//  *
-//  * This route prompts the user to log in.
-//  *
-//  * The 'login' view renders an HTML page, which contain a button prompting the
-//  * user to sign in with Google.  When the user clicks this button, a request
-//  * will be sent to the `GET /login/federated/accounts.google.com` route.
-//  */
-// router.get('/login', function(req, res, next) {
-//   res.render('login');
-// });
-
-// /* GET /login/federated/accounts.google.com
-//  *
-//  * This route redirects the user to Google, where they will authenticate.
-//  *
-//  * Signing in with Google is implemented using OAuth 2.0.  This route initiates
-//  * an OAuth 2.0 flow by redirecting the user to Google's identity server at
-//  * 'https://accounts.google.com'.  Once there, Google will authenticate the user
-//  * and obtain their consent to release identity information to this app.
-//  *
-//  * Once Google has completed their interaction with the user, the user will be
-//  * redirected back to the app at `GET /oauth2/redirect/accounts.google.com`.
-//  */
-// router.get('/login/federated/google', passport.authenticate('google'));
-
-// /*
-//     This route completes the authentication sequence when Google redirects the
-//     user back to the application.  When a new user signs in, a user account is
-//     automatically created and their Google account is linked.  When an existing
-//     user returns, they are signed in to their linked account.
-// */
-// router.get('/oauth2/redirect/google', passport.authenticate('google', {
-//   successReturnToOrRedirect: '/',
-//   failureRedirect: '/login'
-// }));
-
-// /* POST /logout
-//  *
-//  * This route logs the user out.
-//  */
-// router.post('/logout', function(req, res, next) {
-//   req.logout();
-//   res.redirect('/');
-// });
-
-// module.exports = router;
-
-// /////////////
-// // import express from "express";
-// const express = require("express");
-// const passport = require("passport");
-
-// const GoogleStrategy = require("passport-google-oidc");
-
-// passport.use(
-//   new GoogleStrategy(
-//     {
-//       clientID: process.env["GOOGLE_CLIENT_ID"],
-//       clientSecret: process.env["GOOGLE_CLIENT_SECRET"],
-//       callbackURL: "/oauth2/redirect/google",
-//       scope: ["profile"],
-//     },
-//     function verify(issuer, profile, cb) {
-//       db.get(
-//         "SELECT * FROM federated_credentials WHERE provider = ? AND subject = ?",
-//         [issuer, profile.id],
-//         function (err, row) {
-//           if (err) {
-//             return cb(err);
-//           }
-//           if (!row) {
-//             db.run(
-//               "INSERT INTO users (name) VALUES (?)",
-//               [profile.displayName],
-//               function (err) {
-//                 if (err) {
-//                   return cb(err);
-//                 }
-
-//                 var id = this.lastID;
-//                 db.run(
-//                   "INSERT INTO federated_credentials (user_id, provider, subject) VALUES (?, ?, ?)",
-//                   [id, issuer, profile.id],
-//                   function (err) {
-//                     if (err) {
-//                       return cb(err);
-//                     }
-//                     var user = {
-//                       id: id,
-//                       name: profile.displayName,
-//                     };
-//                     return cb(null, user);
-//                   }
-//                 );
-//               }
-//             );
-//           } else {
-//             db.get(
-//               "SELECT * FROM users WHERE id = ?",
-//               [row.user_id],
-//               function (err, row) {
-//                 if (err) {
-//                   return cb(err);
-//                 }
-//                 if (!row) {
-//                   return cb(null, false);
-//                 }
-//                 return cb(null, row);
-//               }
-//             );
-//           }
-//         }
-//       );
-//     }
-//   )
-// );
-// passport.serializeUser(function (user, cb) {
-//   process.nextTick(function () {
-//     cb(null, { id: user.id, username: user.username, name: user.name });
-//   });
-// });
-// passport.deserializeUser(function (user, cb) {
-//   process.nextTick(function () {
-//     return cb(null, user);
-//   });
-// });
-// const db = require("../db");
-
-// const router = express.Router();
-
-// router.get("/login", function (req, res, next) {
-//   res.render("login");
-// });
-// router.get("/login/federated/google", passport.authenticate("google"));
-// router.get(
-//   "/oauth2/redirect/google",
-//   passport.authenticate("google", {
-//     successRedirect: "/",
-//     failureRedirect: "/login",
-//   })
-// );
-// router.post("/logout", function (req, res, next) {
-//   req.logout(function (err) {
-//     if (err) {
-//       return next(err);
-//     }
-//     res.redirect("/");
-//   });
-// });
-
-// module.exports = router;
-// index.js or app.js
-
-const express = require("express");
-const session = require("express-session");
-const passport = require("passport");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
-
-const app = express();
-const port = 2300;
-
-// Session middleware
-app.use(
-  session({
-    secret: "your_session_secret",
-    resave: false,
-    saveUninitialized: true,
-  })
-);
-
-// Initialize Passport
-app.use(passport.initialize());
-app.use(passport.session());
-
-// Configure Google OAuth Strategy
 passport.use(
   new GoogleStrategy(
     {
-      clientID: "your_client_id",
-      clientSecret: "your_client_secret",
-      callbackURL: "/auth/google/callback",
+      clientID: process.env["GOOGLE_CLIENT_ID"],
+      clientSecret: process.env["GOOGLE_CLIENT_SECRET"],
+
+      callbackURL: "http://localhost:5173/login",
+      scope: ["profile"],
     },
-    (accessToken, refreshToken, profile, done) => {
-      // This function is called after successful authentication
-      // Use profile info (e.g., profile.id) to check if user is in your database
-      // Example: findOrCreateUser(profile, done);
-      return done(null, profile);
+    // console.log("hai"),
+    async (accessToken, refreshToken, profile, done) => {
+      //   Check if user already exists in the database
+      console.log("hai", profile);
+      const existingUser = await User.findOne({ googleId: profile.id });
+
+      if (existingUser) {
+        return done(null, existingUser);
+      }
+
+      //   Create new user if not exists
+      const newUser = new User({
+        googleId: profile.id,
+        displayName: profile.displayName,
+        // Add more fields as needed
+      });
+
+      await newUser.save();
+      done(null, newUser);
     }
   )
 );
-
-// Serialize and deserialize user
-passport.serializeUser((user, done) => {
-  done(null, user);
+passport.serializeUser(function (user, cb) {
+  process.nextTick(function () {
+    cb(null, { id: user.id, username: user.username, name: user.name });
+  });
 });
 
-passport.deserializeUser((user, done) => {
-  done(null, user);
+passport.deserializeUser(function (user, cb) {
+  process.nextTick(function () {
+    return cb(null, user);
+  });
 });
 
-// Routes
-app.get("/", (req, res) => {
-  res.send("Home Page");
-});
+const routerr = express.Router();
 
-app.get(
-  "/auth/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
+// router.use("/login", UserLog);
+routerr.get("/login/federated/google", passport.authenticate("google"));
+routerr.get(
+  `http://localhost:5173/login`,
+  passport.authenticate("google", {
+    successRedirect: "/",
+    failureRedirect: "/landing",
+  })
 );
 
-app.get(
-  "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/" }),
-  (req, res) => {
-    // Successful authentication, redirect home.
-    res.redirect("/");
-  }
-);
+export default routerr;
 
-app.get("/profile", (req, res) => {
-  res.send(req.user); // Access authenticated user information
-});
+// // app.js (or index.js)
 
-app.get("/logout", (req, res) => {
-  req.logout();
-  res.redirect("/");
-});
+// const express = require('express');
+// const mongoose = require('mongoose');
+// const session = require('express-session');
+// const passport = require('passport');
+// const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
-// Start server
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+// // Initialize express
+// const app = express();
+
+// // MongoDB connection
+// mongoose.connect('mongodb://localhost/google-auth-example', {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+//   useCreateIndex: true,
+// });
+// const db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+// db.once('open', () => {
+//   console.log('Connected to MongoDB');
+// });
+
+// // Define a user schema
+// const userSchema = new mongoose.Schema({
+//   googleId: String,
+//   displayName: String,
+//   // Add more fields as needed
+// });
+
+// const User = mongoose.model('User', userSchema);
+
+// // Configure express-session middleware
+// app.use(session({
+//   secret: 'your_secret_key',
+//   resave: false,
+//   saveUninitialized: true
+// }));
+
+// // Configure Passport to use Google OAuth2.0
+// passport.use(new GoogleStrategy({
+//     clientID: GOOGLE_CLIENT_ID,
+//     clientSecret: GOOGLE_CLIENT_SECRET,
+//     callbackURL: '/auth/google/callback'
+//   },
+//   async (accessToken, refreshToken, profile, done) => {
+//     // Check if user already exists in the database
+//     const existingUser = await User.findOne({ googleId: profile.id });
+
+//     if (existingUser) {
+//       return done(null, existingUser);
+//     }
+
+//     // Create new user if not exists
+//     const newUser = new User({
+//       googleId: profile.id,
+//       displayName: profile.displayName
+//       // Add more fields as needed
+//     });
+
+//     await newUser.save();
+//     done(null, newUser);
+//   }
+// ));
+
+// // Configure Passport session serialization
+// passport.serializeUser((user, done) => {
+//   done(null, user.id);
+// });
+
+// passport.deserializeUser((id, done) => {
+//   User.findById(id, (err, user) => {
+//     done(err, user);
+//   });
+// });
+
+// // Initialize Passport and restore authentication state, if any, from the session
+// app.use(passport.initialize());
+// app.use(passport.session());
+
+// // Define routes
+// app.get('/auth/google',
+//   passport.authenticate('google', { scope: ['profile'] }));
+
+// app.get('/auth/google/callback',
+//   passport.authenticate('google', { failureRedirect: '/login' }),
+//   (req, res) => {
+//     // Successful authentication, redirect home.
+//     res.redirect('/');
+//   });
+
+// // Example protected route
+// app.get('/profile',
+//   require('connect-ensure-login').ensureLoggedIn(),
+//   (req, res) => {
+//     res.send(req.user);
+//   });
+
+// // Start the server
+// const PORT = process.env.PORT || 3000;
+// app.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
+// });
